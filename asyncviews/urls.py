@@ -22,6 +22,5 @@ from . import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", views.async_view),
-    path("sync/", views.sync_view),
+    path("contador/", views.contador_api),
 ]
