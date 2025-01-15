@@ -10,7 +10,7 @@ async def contador_gen(tempo):
 
 
 async def contador_api(request):
-    tempo = int(request.GET.get("tempo", 130))  # Tempo padrão de 10 segundos
+    tempo = int(request.GET.get("tempo", 130))  
     response = StreamingHttpResponse(
         contador_gen(tempo),
         content_type="text/event-stream",
