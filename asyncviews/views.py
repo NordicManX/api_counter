@@ -1,33 +1,19 @@
 import asyncio
-from time import sleep
-import httpx
+from django.http import StreamingHttpResponse
 from django.http import HttpResponse
 
-
-async def http_call_async():
-    for num in range(1, 6):
+async def contador_gen(tempo):
+    for segundos in range(tempo, -1, -1):
+        yield f"data: Tempo restante: {segundos} segundos\n\n"
         await asyncio.sleep(1)
-        print(num)
-        async with httpx.AsyncClient() as client:
-            r = await client.get("https://httpbin.org")
-            print(r)
+    yield "data: Tempo finalizado!\n\n"
 
 
-def http_call_sync():
-    for num in range(1, 6):
-        sleep(1)
-        print(num)
-    r = httpx.get("https://httpbin.org")
-    print(r)
-        
-
-
-async def async_view(request):
-    loop = asyncio.get_event_loop()
-    loop.create_task(http_call_async())
-    return HttpResponse("Non-blocking HTTP request initiated.")
-
-
-def sync_view(request):
-    http_call_sync()
-    return HttpResponse("Blocking HTTP request.")
+async def contador_api(request):
+    tempo = int(request.GET.get("tempo", 130))  # Tempo padrão de 10 segundos
+    response = StreamingHttpResponse(
+        contador_gen(tempo),
+        content_type="text/event-stream",
+    )
+    response["Cache-Control"] = "no-cache"
+    return response
